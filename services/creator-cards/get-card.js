@@ -47,7 +47,7 @@ async function getCard(serviceData) {
       access_type: card.access_type,
       created: card.created,
       updated: card.updated,
-      deleted: card.deleted,
+      deleted: card.deleted === 0 || !card.deleted ? null : card.deleted,
     };
   } catch (error) {
     appLogger.errorX(error, 'get-creator-card-error');

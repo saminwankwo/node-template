@@ -22,6 +22,7 @@ async function deleteCard(serviceData) {
       throwAppError(CreatorCardMessages.CARD_NOT_FOUND, ERROR_CODE.NF01);
     }
 
+    const deletedAt = Date.now();
     await CreatorCard.deleteOne({ query: { _id: card._id } });
 
     response = {
@@ -34,10 +35,10 @@ async function deleteCard(serviceData) {
       service_rates: card.service_rates,
       status: card.status,
       access_type: card.access_type,
-      access_code: card.access_code,
+      access_code: card.access_code || null,
       created: card.created,
       updated: card.updated,
-      deleted: Date.now(),
+      deleted: deletedAt,
     };
   } catch (error) {
     appLogger.errorX(error, 'delete-creator-card-error');

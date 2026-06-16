@@ -72,6 +72,25 @@ async function createCard(serviceData) {
       throwAppError(CreatorCardMessages.ACCESS_CODE_INVALID_ON_PUBLIC, ERROR_CODE.AC05);
     }
 
+    // Validate access_code is alphanumeric (only letters and numbers)
+    if (data.access_code) {
+      const alphanumericRegex = /^[a-zA-Z0-9]+$/;
+      if (!alphanumericRegex.test(data.access_code)) {
+        throwAppError('access_code must be alphanumeric', ERROR_CODE.INVLDDATA);
+      }
+    }
+
+    // Validate service_rates.rates is non-empty array when service_rates is provided
+    if (data.service_rates) {
+      if (
+        !data.service_rates.rates ||
+        !Array.isArray(data.service_rates.rates) ||
+        data.service_rates.rates.length === 0
+      ) {
+        throwAppError('service_rates.rates must be a non-empty array', ERROR_CODE.INVLDDATA);
+      }
+    }
+
     // Validate URLs start with http:// or https://
     if (data.links) {
       data.links.forEach((link) => {
@@ -141,10 +160,10 @@ async function createCard(serviceData) {
       service_rates: newCard.service_rates,
       status: newCard.status,
       access_type: newCard.access_type,
-      access_code: newCard.access_code,
+      access_code: newCard.access_code || null,
       created: newCard.created,
       updated: newCard.updated,
-      deleted: newCard.deleted,
+      deleted: newCard.deleted === 0 || !newCard.deleted ? null : newCard.deleted,
     };
   } catch (error) {
     appLogger.errorX(error, 'create-creator-card-error');
